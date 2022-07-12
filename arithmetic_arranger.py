@@ -4,7 +4,13 @@ import re
 def arithmetic_arranger(problems, solve=False):
     """ Arranges a list of arithmetic problems vertically """
 
-    if len(problems) > 4:
+    ## error check (if any return)
+    ## split
+    ## solve (if arg2 == True, append solutions)
+    ## pad (to max length + 2)
+    ## join
+
+    if len(problems) > 5:
         return "Error: Too many problems."
 
 	# split and solve problems
@@ -43,10 +49,7 @@ def solve_problem(x, op, y):
 
 def pad_problem(problem, solve=False):
     (x, op, y, z) = problem
-    if solve:
-        max_length = max(len(x), len(y), len(z))
-    else:
-        max_length = max(len(x), len(y))
+    max_length = max(len(x), len(y))
 
     top = x.rjust(max_length + 2, ' ')
     middle = op + ' ' + y.rjust(max_length, ' ')
@@ -61,10 +64,10 @@ def pad_problem(problem, solve=False):
 def arrange_problems(padded_problems, solve=False):
     arranged = "    ".join(map(lambda x: x[0], padded_problems)) + "\n"
     arranged += "    ".join(map(lambda x: x[1], padded_problems)) + "\n"
-    arranged += "    ".join(map(lambda x: x[2], padded_problems)) + "\n"
+    arranged += "    ".join(map(lambda x: x[2], padded_problems)) 
 
     if solve:
-        arranged += "    ".join(map(lambda x: x[3], padded_problems)) + "\n"
+        arranged += "\n" + "    ".join(map(lambda x: x[3], padded_problems))
 
     return arranged 
 
@@ -81,11 +84,3 @@ def is_digits_only(number):
 
 def is_length_ok(number):
     return len(number) <= 4
-
-
-def format_problem(problem):
-    max_length = get_max_length(problem)
-    
-
-def get_max_length(problem_tuple):
-    return max(map(len, problem_tuple))
