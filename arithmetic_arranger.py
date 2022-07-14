@@ -4,7 +4,6 @@ def arithmetic_arranger(problems, solve=False):
     """ Arranges a list of arithmetic problems vertically """
 
     split_problems = [split_problem(p) for p in problems]
-
     error = check_problem_set_for_errors(split_problems)
 
     if error:
@@ -14,7 +13,6 @@ def arithmetic_arranger(problems, solve=False):
         split_problems = [add_solution(p) for p in split_problems]
 
     vertical_problems = [arrange_vertically(p) for p in split_problems]
-
     arranged_problems = arrange_problems(vertical_problems)
 
     return arranged_problems
@@ -80,28 +78,28 @@ def add_solution(problem):
 def arrange_vertically(problem):
     """ Returns a tuple of problem part strings with the padding needed to align the problem vertically """
 
-    x = problem[0]
-    op = problem[1]
-    y = problem[2]
+    (x, op, y, *z) = problem
     max_length = max(len(x), len(y))
 
     top = x.rjust(max_length + 2, ' ')
     middle = op + ' ' + y.rjust(max_length, ' ')
-    line = '-' * (max_length + 2)
+    separator = '-' * (max_length + 2)
 
-    if len(problem) == 4:
-        bottom = problem[3].rjust(max_length + 2, ' ')
-        return (top, middle, line, bottom)
+    if len(z) == 0:
+        return (top, middle, separator)
     else:
-        return (top, middle, line)
+        bottom = z[0].rjust(max_length + 2, ' ')
+        return (top, middle, separator, bottom)
 
 
 def arrange_problems(padded_problems):
     """ Returns a multi-line string of the padded problems arranged side-by-side"""
-    arranged = "    ".join(map(lambda x: x[0], padded_problems)) + "\n"
-    arranged += "    ".join(map(lambda x: x[1], padded_problems)) + "\n"
-    arranged += "    ".join(map(lambda x: x[2], padded_problems)) 
 
+    arranged = "    ".join([x[0] for x in padded_problems]) + "\n"
+    arranged += "    ".join([x[1] for x in padded_problems]) + "\n"
+    arranged += "    ".join([x[2] for x in padded_problems])
+
+	# include solution line if populated
     if len(padded_problems[0]) == 4:
         arranged += "\n" + "    ".join(map(lambda x: x[3], padded_problems))
 
