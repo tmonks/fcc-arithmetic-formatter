@@ -1,28 +1,36 @@
 import re
 
-
 def arithmetic_arranger(problems, solve=False):
     """ Arranges a list of arithmetic problems vertically """
 
-    problem_parts = [convert_to_parts(p) for p in problems]
+    split_problems = [split_problem(p) for p in problems]
 
-    error = check_problem_set_for_errors(problem_parts)
+    error = check_problem_set_for_errors(split_problems)
 
     if error:
         return error
 
     if solve:
-        problem_parts = [solve_problem(p) for p in problem_parts]
+        split_problems = [add_solution(p) for p in split_problems]
 
-    # pad each problem to the correct string length
-    padded = [pad_problem(p) for p in problem_parts]
+    vertical_problems = [arrange_vertically(p) for p in split_problems]
 
-    return arrange_problems(padded)
+    arranged_problems = arrange_problems(vertical_problems)
 
-def convert_to_parts(problem): 
+    return arranged_problems
+
+
+def split_problem(problem): 
+    """ Split a problem into a tuple of its parts, such as ('32', '+', '47') """
     return tuple(problem.split())
 
+
 def check_problem_set_for_errors(problems):
+    """ 
+    Checks a problem set for errors and returns either None 
+    or a string desribing the first error found. 
+    """
+
     if len(problems) > 5:
         return "Error: Too many problems."
     
@@ -31,7 +39,15 @@ def check_problem_set_for_errors(problems):
         if error:
             return error
 
+    return None
+
+
 def check_for_error(problem):
+    """ 
+    Checks a problem for errors and returns either None 
+    or a string desribing the first error found. 
+    """
+
     (x, op, y) = problem
 
     if not is_operator_valid(op):
@@ -44,7 +60,13 @@ def check_for_error(problem):
     return None
 
 
-def solve_problem(problem):
+def add_solution(problem):
+    """ 
+    Solves the problem and returns a 4-item tuple including the solution
+    Example:  
+    >>> add_solution(('32','+','43')) 
+    ('32','+','43','75)
+    """
     (x, op, y) = problem
 
     if op == "+":
@@ -54,7 +76,10 @@ def solve_problem(problem):
 
     return (x, op, y, solution)
 
-def pad_problem(problem):
+
+def arrange_vertically(problem):
+    """ Returns a tuple of problem part strings with the padding needed to align the problem vertically """
+
     x = problem[0]
     op = problem[1]
     y = problem[2]
@@ -70,7 +95,9 @@ def pad_problem(problem):
     else:
         return (top, middle, line)
 
+
 def arrange_problems(padded_problems):
+    """ Returns a multi-line string of the padded problems arranged side-by-side"""
     arranged = "    ".join(map(lambda x: x[0], padded_problems)) + "\n"
     arranged += "    ".join(map(lambda x: x[1], padded_problems)) + "\n"
     arranged += "    ".join(map(lambda x: x[2], padded_problems)) 
