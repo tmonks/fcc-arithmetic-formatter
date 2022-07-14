@@ -4,72 +4,82 @@ import re
 def arithmetic_arranger(problems, solve=False):
     """ Arranges a list of arithmetic problems vertically """
 
-    ## error check (if any return)
-    ## split
-    ## solve (if arg2 == True, append solutions)
-    ## pad (to max length + 2)
-    ## join
+    problem_parts = [convert_to_parts(p) for p in problems]
 
-    if len(problems) > 5:
-        return "Error: Too many problems."
+    error = check_problem_set_for_errors(problem_parts)
 
-	# split and solve problems
-    try:
-        problem_tuples = split_and_solve(problems)
-    except Exception as e:
-        return str(e)
+    if error:
+        return error
+
+    if solve:
+        problem_parts = [solve_problem(p) for p in problem_parts]
 
     # pad each problem to the correct string length
-    padded = list(map(lambda p: pad_problem(p, solve), problem_tuples))
+    padded = [pad_problem(p) for p in problem_parts]
 
-    return arrange_problems(padded, solve)
+    return arrange_problems(padded)
 
+def convert_to_parts(problem): 
+    return tuple(problem.split())
 
-def split_and_solve(problems):
-    return list(map(parse, problems))
+def check_problem_set_for_errors(problems):
+    if len(problems) > 5:
+        return "Error: Too many problems."
+    
+    for problem in problems:
+        error = check_for_error(problem)
+        if error:
+            return error
 
-def parse(problem):
-    [x, op, y] = problem.split()
+def check_for_error(problem):
+    (x, op, y) = problem
 
     if not is_operator_valid(op):
-        raise Exception("Error: Operator must be '+' or '-'.")
+        return "Error: Operator must be '+' or '-'."
     if not is_digits_only(x) or not is_digits_only(y):
-        raise Exception("Error: Numbers must only contain digits.")
+        return "Error: Numbers must only contain digits."
     if not is_length_ok(x) or not is_length_ok(y):
-        raise Exception("Error: Numbers cannot be more than four digits.")
+        return "Error: Numbers cannot be more than four digits."
 
-    return (x, op, y, solve_problem(x,op,y))
+    return None
 
 
-def solve_problem(x, op, y):
+def solve_problem(problem):
+    (x, op, y) = problem
+
     if op == "+":
-        return str(int(x) + int(y))
+        solution = str(int(x) + int(y))
     else:
-        return str(int(x) - int(y))
+        solution = str(int(x) - int(y))
 
-def pad_problem(problem, solve=False):
-    (x, op, y, z) = problem
+    return (x, op, y, solution)
+
+def pad_problem(problem):
+    x = problem[0]
+    op = problem[1]
+    y = problem[2]
     max_length = max(len(x), len(y))
 
     top = x.rjust(max_length + 2, ' ')
     middle = op + ' ' + y.rjust(max_length, ' ')
     line = '-' * (max_length + 2)
-    bottom = z.rjust(max_length + 2, ' ')
 
-    if solve:
+    if len(problem) == 4:
+        bottom = problem[3].rjust(max_length + 2, ' ')
         return (top, middle, line, bottom)
     else:
         return (top, middle, line)
 
-def arrange_problems(padded_problems, solve=False):
+def arrange_problems(padded_problems):
     arranged = "    ".join(map(lambda x: x[0], padded_problems)) + "\n"
     arranged += "    ".join(map(lambda x: x[1], padded_problems)) + "\n"
     arranged += "    ".join(map(lambda x: x[2], padded_problems)) 
 
-    if solve:
+    if len(padded_problems[0]) == 4:
         arranged += "\n" + "    ".join(map(lambda x: x[3], padded_problems))
 
     return arranged 
+
 
 def is_operator_valid(op):
     return op in ['-', '+']
